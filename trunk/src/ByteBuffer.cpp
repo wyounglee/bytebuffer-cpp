@@ -142,6 +142,12 @@ byte ByteBuffer::get(int index) {
 	return read<byte>(index);
 }
 
+void ByteBuffer::getBytes(byte* buf, int len) {
+	for(int i = 0; i < len; i++) {
+		buf[i] = read<byte>();
+	}
+}
+
 char ByteBuffer::getChar() {
 	return read<char>();
 }
@@ -209,15 +215,18 @@ void ByteBuffer::put(byte b, int index) {
 
 void ByteBuffer::putBytes(byte* b, int len, int index) {
 	// Default index value (-1) indicates to start writing at the current write position
-	index = wpos;
+	if(index == -1)
+		index = wpos;
+	else // Otherwise, change the write position
+		wpos = index;
 
 	// Ending write position must be within the bounds
-	if((index+len) >= size())
-		return;
+	/*if((index+len) >= size())
+		return;*/
 
 	// Insert the data one byte at a time into the internal buffer at position i+starting index
 	for(int i = 0; i < len; i++)
-		insert<byte>(b[i], i+index);
+		append<byte>(b[i]);
 }
 
 void ByteBuffer::putChar(char value) {

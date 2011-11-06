@@ -84,7 +84,7 @@ public:
 
 	byte get(); // Relative get method. Reads the byte at the buffers current position then increments the position
 	byte get(int index); // Absolute get method. Read byte at index
-	void getBytes(byte* buf, int len); // Absolute read into array buf of length len, starting at index. Default index of -1 indicates start at current read index
+	void getBytes(byte* buf, int len); // Absolute read into array buf of length len
 	char getChar(); // Relative
 	char getChar(int index); // Absolute
 	double getDouble();
