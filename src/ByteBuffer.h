@@ -22,21 +22,26 @@
 // If defined, utility functions within the class are enabled
 #define BB_UTILITY
 
+#include <cstdlib>
+#include <cstring>
 #include <vector>
+
 #ifdef BB_UTILITY
 #include <iostream>
+#include <stdio.h>
 #endif
 
+using namespace std;
 
 typedef unsigned char byte;
 
 class ByteBuffer {
 private:
 	int rpos, wpos;
-	std::vector<byte> buf;
+	vector<byte> buf;
 
 #ifdef BB_UTILITY
-	std::string name;
+	string name;
 #endif
 
     template <typename T> T read() {
@@ -137,8 +142,8 @@ public:
 
 	// Utility Functions
 #ifdef BB_UTILITY
-	void setName(std::string n);
-	std::string getName();
+	void setName(string n);
+	string getName();
 	void printAscii();
 	void printHex();
 	void printPosition();

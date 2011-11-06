@@ -16,8 +16,8 @@
    limitations under the License.
 */
 
-#include "ByteBuffer.h"
 #include <stdio.h>
+#include "ByteBuffer.h"
 
 int main() {
 	ByteBuffer *bb1 = new ByteBuffer(30);
@@ -37,6 +37,5 @@ int main() {
 	printf("t1 = %x, t2 = %x, t3 = %x, t4 = %x, t5 = %x\n", t1, t2, t3, t4, t5);
 	bb1->printPosition();
 	delete bb1;
-	system("pause");
 	return 0;
 }
