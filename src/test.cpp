@@ -26,14 +26,17 @@ int main() {
 	bb1->put(0xAD);
 	bb1->put(0xBA);
 	bb1->put(0xBE);
+
 	bb1->printHex();
 	bb1->printPosition();
+
 	byte t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 1;
 	t1 = bb1->get();
 	t2 = bb1->get();
 	t3 = bb1->get();
 	t4 = bb1->get();
 	t5 = bb1->get();
+
 	printf("t1 = %x, t2 = %x, t3 = %x, t4 = %x, t5 = %x\n", t1, t2, t3, t4, t5);
 	bb1->printPosition();
 	delete bb1;

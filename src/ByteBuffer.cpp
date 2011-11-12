@@ -24,7 +24,7 @@
  * 
  * @param size Size of space to preallocate internally. Default is 4096 bytes
  */
-ByteBuffer::ByteBuffer(int size) {
+ByteBuffer::ByteBuffer(unsigned int size) {
 	rpos = 0;
 	wpos = 0;
 	buf.reserve(size);
@@ -40,7 +40,7 @@ ByteBuffer::ByteBuffer(int size) {
  * @param arr byte array of data (should be of length len)
  * @param size Size of space to allocate
  */
-ByteBuffer::ByteBuffer(byte* arr, int size) {
+ByteBuffer::ByteBuffer(byte* arr, unsigned int size) {
 	rpos = 0;
 	wpos = 0;
 	buf.reserve(size);
@@ -77,7 +77,7 @@ ByteBuffer* ByteBuffer::clone() {
 	ByteBuffer* ret = new ByteBuffer(buf.size());
 
 	// Copy data
-	for(int i = 0; i < buf.size(); i++) {
+	for(unsigned int i = 0; i < buf.size(); i++) {
 		ret->put(i, (byte)get(i));
 	}
 
@@ -101,8 +101,8 @@ bool ByteBuffer::equals(ByteBuffer* other) {
 		return false;
 
 	// Compare byte by byte
-	int len = size();
-	for(int i = 0; i < len; i++) {
+	unsigned int len = size();
+	for(unsigned int i = 0; i < len; i++) {
 		if((byte)get(i) != (byte)other->get(i))
 			return false;
 	}
@@ -116,7 +116,7 @@ bool ByteBuffer::equals(ByteBuffer* other) {
  *
  * @param newSize The amount of memory to allocate
  */
-void ByteBuffer::resize(int newSize) {
+void ByteBuffer::resize(unsigned int newSize) {
 	buf.resize(newSize);
 	rpos = 0;
 	wpos = 0;
@@ -128,7 +128,7 @@ void ByteBuffer::resize(int newSize) {
  *
  * @return size of the internal buffer
  */
-int ByteBuffer::size() {
+unsigned int ByteBuffer::size() {
 	return buf.size();
 }
 
@@ -138,12 +138,12 @@ byte ByteBuffer::get() {
 	return read<byte>();
 }
 
-byte ByteBuffer::get(int index) {
+byte ByteBuffer::get(unsigned int index) {
 	return read<byte>(index);
 }
 
-void ByteBuffer::getBytes(byte* buf, int len) {
-	for(int i = 0; i < len; i++) {
+void ByteBuffer::getBytes(byte* buf, unsigned int len) {
+	for(unsigned int i = 0; i < len; i++) {
 		buf[i] = read<byte>();
 	}
 }
@@ -152,7 +152,7 @@ char ByteBuffer::getChar() {
 	return read<char>();
 }
 
-char ByteBuffer::getChar(int index) {
+char ByteBuffer::getChar(unsigned int index) {
 	return read<char>(index);
 }
 
@@ -160,7 +160,7 @@ double ByteBuffer::getDouble() {
 	return read<double>();
 }
 
-double ByteBuffer::getDouble(int index) {
+double ByteBuffer::getDouble(unsigned int index) {
 	return read<double>(index);
 }
 
@@ -168,7 +168,7 @@ float ByteBuffer::getFloat() {
 	return read<float>();
 }
 
-float ByteBuffer::getFloat(int index) {
+float ByteBuffer::getFloat(unsigned int index) {
 	return read<float>(index);
 }
 
@@ -176,7 +176,7 @@ int ByteBuffer::getInt() {
 	return read<int>();
 }
 
-int ByteBuffer::getInt(int index) {
+int ByteBuffer::getInt(unsigned int index) {
 	return read<int>(index);
 }
 
@@ -184,7 +184,7 @@ long ByteBuffer::getLong() {
 	return read<long>();
 }
 
-long ByteBuffer::getLong(int index) {
+long ByteBuffer::getLong(unsigned int index) {
 	return read<long>(index);
 }
 
@@ -192,7 +192,7 @@ short ByteBuffer::getShort() {
 	return read<short>();
 }
 
-short ByteBuffer::getShort(int index) {
+short ByteBuffer::getShort(unsigned int index) {
 	return read<short>(index);
 }
 
@@ -209,23 +209,21 @@ void ByteBuffer::put(byte b) {
 	append<byte>(b);
 }
 
-void ByteBuffer::put(byte b, int index) {
+void ByteBuffer::put(byte b, unsigned int index) {
 	insert<byte>(b, index);
 }
 
-void ByteBuffer::putBytes(byte* b, int len, int index) {
-	// Default index value (-1) indicates to start writing at the current write position
-	if(index == -1)
-		index = wpos;
-	else // Otherwise, change the write position
-		wpos = index;
+void ByteBuffer::putBytes(byte* b, unsigned int len) {
+	// Insert the data one byte at a time into the internal buffer at position i+starting index
+	for(unsigned int i = 0; i < len; i++)
+		append<byte>(b[i]);
+}
 
-	// Ending write position must be within the bounds
-	/*if((index+len) >= size())
-		return;*/
+void ByteBuffer::putBytes(byte* b, unsigned int len, unsigned int index) {
+	wpos = index;
 
 	// Insert the data one byte at a time into the internal buffer at position i+starting index
-	for(int i = 0; i < len; i++)
+	for(unsigned int i = 0; i < len; i++)
 		append<byte>(b[i]);
 }
 
@@ -233,7 +231,7 @@ void ByteBuffer::putChar(char value) {
 	append<char>(value);
 }
 
-void ByteBuffer::putChar(char value, int index) {
+void ByteBuffer::putChar(char value, unsigned int index) {
 	insert<char>(value, index);
 }
 
@@ -241,14 +239,14 @@ void ByteBuffer::putDouble(double value) {
 	append<double>(value);
 }
 
-void ByteBuffer::putDouble(double value, int index) {
+void ByteBuffer::putDouble(double value, unsigned int index) {
 	insert<double>(value, index);
 }
 void ByteBuffer::putFloat(float value) {
 	append<float>(value);
 }
 
-void ByteBuffer::putFloat(float value, int index) {
+void ByteBuffer::putFloat(float value, unsigned int index) {
 	insert<float>(value, index);
 }
 
@@ -256,7 +254,7 @@ void ByteBuffer::putInt(int value) {
 	append<int>(value);
 }
 
-void ByteBuffer::putInt(int value, int index) {
+void ByteBuffer::putInt(int value, unsigned int index) {
 	insert<int>(value, index);
 }
 
@@ -264,7 +262,7 @@ void ByteBuffer::putLong(long value) {
 	append<long>(value);
 }
 
-void ByteBuffer::putLong(long value, int index) {
+void ByteBuffer::putLong(long value, unsigned int index) {
 	insert<long>(value, index);
 }
 
@@ -272,7 +270,7 @@ void ByteBuffer::putShort(short value) {
 	append<short>(value);
 }
 
-void ByteBuffer::putShort(short value, int index) {
+void ByteBuffer::putShort(short value, unsigned int index) {
 	insert<short>(value, index);
 }
 
@@ -287,25 +285,25 @@ std::string ByteBuffer::getName() {
 }
 
 void ByteBuffer::printAscii() {
-	int length = buf.size();
+	unsigned int length = buf.size();
 	std::cout << "ByteBuffer " << name.c_str() << ", Length: " << length << ". ASCII Print" << std::endl;
-	for(int i = 0; i < length; i++) {
+	for(unsigned int i = 0; i < length; i++) {
 		printf("%c ", buf[i]);
 	}
 	printf("\n");
 }
 
 void ByteBuffer::printHex() {
-	int length = buf.size();
+	unsigned int length = buf.size();
 	std::cout << "ByteBuffer " << name.c_str() << ", Length: " << length << ". Hex Print" << std::endl;
-	for(int i = 0; i < length; i++) {
+	for(unsigned int i = 0; i < length; i++) {
 		printf("0x%02x ", buf[i]);
 	}
 	printf("\n");
 }
 
 void ByteBuffer::printPosition() {
-	int length = buf.size();
+	unsigned int length = buf.size();
 	std::cout << "ByteBuffer " << name.c_str() << ", Length: " << length << " Read Pos: " << rpos << ". Write Pos: " << wpos << std::endl;
 }
 #endif

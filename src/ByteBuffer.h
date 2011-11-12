@@ -37,7 +37,7 @@ typedef unsigned char byte;
 
 class ByteBuffer {
 private:
-	int rpos, wpos;
+	unsigned int rpos, wpos;
 	vector<byte> buf;
 
 #ifdef BB_UTILITY
@@ -50,22 +50,23 @@ private:
 		return data;
 	}
 	
-	template <typename T> T read(int index) const {
+	template <typename T> T read(unsigned int index) const {
 		if(index + sizeof(T) <= buf.size())
 			return *((T*)&buf[index]);
-		return NULL;
+		return 0;
 	}
 
 	template <typename T> void append(T data) {
-		int s = sizeof(data);
+		unsigned int s = sizeof(data);
 
 		if (size() < (wpos + s))
 			buf.resize(wpos + s);
 		memcpy(&buf[wpos], (byte*)&data, s);
+
 		wpos += s;
 	}
 	
-	template <typename T> void insert(T data, int index) {
+	template <typename T> void insert(T data, unsigned int index) {
 		if((index + sizeof(data)) > size())
 			return;
 
@@ -74,53 +75,54 @@ private:
 	}
 
 public:
-	ByteBuffer(int size = 4096);
-	ByteBuffer(byte* arr, int size);
+	ByteBuffer(unsigned int size = 4096);
+	ByteBuffer(byte* arr, unsigned int size);
 	~ByteBuffer();
 
 	void clear(); // Clear our the vector and reset read and write positions
 	ByteBuffer* clone(); // Return a new instance of a bytebuffer with the exact same contents and the same state (rpos, wpos)
 	//ByteBuffer compact(); // TODO?
 	bool equals(ByteBuffer* other); // Compare if the contents are equivalent
-	void resize(int newSize);
-	int size(); // Size of internal vector
+	void resize(unsigned int newSize);
+	unsigned int size(); // Size of internal vector
 	
 	// Read
 
 	byte get(); // Relative get method. Reads the byte at the buffers current position then increments the position
-	byte get(int index); // Absolute get method. Read byte at index
-	void getBytes(byte* buf, int len); // Absolute read into array buf of length len
+	byte get(unsigned int index); // Absolute get method. Read byte at index
+	void getBytes(byte* buf, unsigned int len); // Absolute read into array buf of length len
 	char getChar(); // Relative
-	char getChar(int index); // Absolute
+	char getChar(unsigned int index); // Absolute
 	double getDouble();
-	double getDouble(int index);
+	double getDouble(unsigned int index);
 	float getFloat();
-	float getFloat(int index);
+	float getFloat(unsigned int index);
 	int getInt();
-	int getInt(int index);
+	int getInt(unsigned int index);
 	long getLong();
-	long getLong(int index);
+	long getLong(unsigned int index);
 	short getShort();
-	short getShort(int index);
+	short getShort(unsigned int index);
 
 	// Write
 
 	void put(ByteBuffer* src); // Relative write of the entire contents of another ByteBuffer (src)
 	void put(byte b); // Relative write
-	void put(byte b, int index); // Absolute write at index
-	void putBytes(byte* b, int len, int index=-1); // Absolute write starting at index. Default index of -1 indicates start at current write index
+	void put(byte b, unsigned int index); // Absolute write at index
+	void putBytes(byte* b, unsigned int len); // Relative write
+	void putBytes(byte* b, unsigned int len, unsigned int index); // Absolute write starting at index
 	void putChar(char value); // Relative
-	void putChar(char value, int index); // Absolute
+	void putChar(char value, unsigned int index); // Absolute
 	void putDouble(double value);
-	void putDouble(double value, int index);
+	void putDouble(double value, unsigned int index);
 	void putFloat(float value);
-	void putFloat(float value, int index);
+	void putFloat(float value, unsigned int index);
 	void putInt(int value);
-	void putInt(int value, int index);
+	void putInt(int value, unsigned int index);
 	void putLong(long value);
-	void putLong(long value, int index);
+	void putLong(long value, unsigned int index);
 	void putShort(short value);
-	void putShort(short value, int index);
+	void putShort(short value, unsigned int index);
 
 	// Buffer Position Accessors & Mutators
 
