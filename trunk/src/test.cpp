@@ -29,6 +29,10 @@ int main() {
 
 	bb1->printHex();
 	bb1->printPosition();
+    
+    int f0 = -1, f1 = -1, f2 = -1;
+    f0 = bb1->find((short)0xBEBA);
+    f1 = bb1->find((byte)0xBA);
 
 	byte t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 1;
 	t1 = bb1->get();
@@ -36,8 +40,11 @@ int main() {
 	t3 = bb1->get();
 	t4 = bb1->get();
 	t5 = bb1->get();
+    
+    f2 = bb1->find((byte)0xDE, bb1->getReadPos());
 
 	printf("t1 = %x, t2 = %x, t3 = %x, t4 = %x, t5 = %x\n", t1, t2, t3, t4, t5);
+    printf("f0 = %i, f1 = %i, f2 = %i\n", f0, f1, f2);
 	bb1->printPosition();
 	delete bb1;
 	return 0;

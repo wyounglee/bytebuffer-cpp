@@ -58,6 +58,16 @@ ByteBuffer::~ByteBuffer() {
 }
 
 /**
+ * Bytes Remaining
+ * Returns the number of bytes from the current read position till the end of the buffer
+ *
+ * @return Number of bytes from rpos to the end (size())
+ */
+unsigned int ByteBuffer::bytesRemaining() {
+	return size()-rpos;
+}
+
+/**
  * Clear
  * Clears out all data from the internal vector (original preallocated size remains), resets the positions to 0
  */
@@ -132,7 +142,39 @@ unsigned int ByteBuffer::size() {
 	return buf.size();
 }
 
+// Replacement
+
+/**
+ * Replace
+ * Replace occurance of a particular byte, key, with the byte rep
+ *
+ * @param key Byte to find for replacement
+ * @param rep Byte to replace the found key with
+ * @param start Index to start from. By default, start is 0
+ * @param firstOccuranceOnly If true, only replace the first occurance of the key. If false, replace all occurances. False by default
+ */
+void ByteBuffer::replace(byte key, byte rep, unsigned int start, bool firstOccuranceOnly) {
+    unsigned int len = buf.size();
+    for(unsigned int i = start; i < len; i++) {
+        byte data = read<byte>(i);
+        // Wasn't actually found, bounds of buffer were exceeded
+        if((key != 0) && (data == 0))
+            break;
+        
+        // Key was found in array, perform replacement
+        if(data == key) {
+            buf[i] = rep;
+            if(firstOccuranceOnly)
+                return;
+        }
+    }
+}
+
 // Read Functions
+
+byte ByteBuffer::peek() {
+	return read<byte>(rpos);
+}
 
 byte ByteBuffer::get() {
 	return read<byte>();
