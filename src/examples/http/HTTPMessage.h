@@ -1,0 +1,89 @@
+/**
+ ByteBuffer
+ HTTPMessage.h
+ Copyright 2011 Ramsey Kant
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+#ifndef _HTTPMessage_h
+#define _HTTPMessage_h
+
+#include <map>
+#include <string>
+
+#include "../../ByteBuffer.h"
+
+// Constants
+#define HTTP_VERSION "HTTP/1.1"
+#define SERVER_HEAD "httpserver/1.0 ramsey"
+
+// HTTP Response Status codes
+enum Status {
+    // 1xx Informational
+    CONTINUE = 100,
+    
+    // 2xx Success
+    OK = 200,
+    
+    // 3xx Redirection
+    
+    // 4xx Client Error
+    NOT_FOUND = 404,
+    
+    // 5xx Server Error
+    SERVER_ERROR = 500,
+    NOT_IMPLEMENTED = 501
+};
+
+class HTTPMessage : public ByteBuffer {
+private:
+    map<string, string> *headers;
+
+protected:
+    // Flag to determine if there was an error parsing the request
+    bool parseError;
+	string parseErrorStr;
+
+protected:
+    virtual void init();
+    
+public:
+    HTTPMessage();
+    HTTPMessage(string sData);
+    HTTPMessage(byte *pData, unsigned int len);
+    virtual ~HTTPMessage();
+    
+    virtual byte* create() {return NULL;};
+    virtual void parse() {};
+    
+	string getLine();
+    string getStrElement(char delim = ' ');
+    
+	void addHeader(string line);
+    void addHeader(string key, string value);
+    string getHeaderValue(string key);
+    void clearHeaders();
+    
+    // Getters & Setters
+    
+    bool hasParseError() {
+        return parseError;
+    }
+
+	string getParseError() {
+		return parseErrorStr;
+	}
+};
+
+#endif

@@ -79,15 +79,39 @@ public:
 	ByteBuffer(byte* arr, unsigned int size);
 	~ByteBuffer();
 
+	unsigned int bytesRemaining(); // Number of bytes from the current read position till the end of the buffer
 	void clear(); // Clear our the vector and reset read and write positions
 	ByteBuffer* clone(); // Return a new instance of a bytebuffer with the exact same contents and the same state (rpos, wpos)
 	//ByteBuffer compact(); // TODO?
 	bool equals(ByteBuffer* other); // Compare if the contents are equivalent
 	void resize(unsigned int newSize);
 	unsigned int size(); // Size of internal vector
+    
+    // Basic Searching (Linear)
+    template <typename T> int find(T key, unsigned int start=0) {
+        int ret = -1;
+        unsigned int len = buf.size();
+        for(unsigned int i = start; i < len; i++) {
+            T data = read<T>(i);
+            // Wasn't actually found, bounds of buffer were exceeded
+            if((key != 0) && (data == 0))
+                break;
+            
+            // Key was found in array
+            if(data == key) {
+                ret = i;
+                break;
+            }
+        }
+        return ret;
+    }
+    
+    // Replacement
+    void replace(byte key, byte rep, unsigned int start = 0, bool firstOccuranceOnly=false);
 	
 	// Read
 
+	byte peek(); // Relative peek. Reads and returns the next byte in the buffer from the current position but does not increment the read position
 	byte get(); // Relative get method. Reads the byte at the buffers current position then increments the position
 	byte get(unsigned int index); // Absolute get method. Read byte at index
 	void getBytes(byte* buf, unsigned int len); // Absolute read into array buf of length len
