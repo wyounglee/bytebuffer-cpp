@@ -150,7 +150,7 @@ public:
 
 	// Buffer Position Accessors & Mutators
 
-	void setReadPos(int r) {
+	void setReadPos(unsigned int r) {
 		rpos = r;
 	}
 
@@ -158,7 +158,7 @@ public:
 		return rpos;
 	}
 
-	void setWritePos(int w) {
+	void setWritePos(unsigned int w) {
 		wpos = w;
 	}
 

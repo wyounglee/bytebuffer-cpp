@@ -67,11 +67,14 @@ public:
     virtual byte* create() {return NULL;};
     virtual void parse() {};
     
+    void putLine(string str, bool crlf_end=true);
+    
 	string getLine();
     string getStrElement(char delim = ' ');
     
 	void addHeader(string line);
     void addHeader(string key, string value);
+    void putHeaders();
     string getHeaderValue(string key);
     void clearHeaders();
     
