@@ -26,6 +26,22 @@ void HTTPMessage::init() {
 }
 
 /**
+ * Put Line
+ * Append a line (string) to the backing ByteBuffer at the current position
+ *
+ * @param str String to put into the byte buffer
+ * @param crlf_end If true (default), end the line with a \r\n
+ */
+void HTTPMessage::putLine(string str, bool crlf_end) {
+    // Terminate with crlf if flag set
+    if(crlf_end)
+        str += "\r\n";
+    
+    // Put the entire contents of str (with null termination) into the buffer
+    putBytes((byte*)str.c_str(), str.size()+1);
+}
+
+/**
  * Get Line
  * Retrive the entire contents of a line: string from current position until CR or LF, whichever comes first, then increment the read position
  * until it's past the last CR or LF in the line
@@ -103,11 +119,15 @@ string HTTPMessage::getStrElement(char delim) {
 }
 
 void HTTPMessage::addHeader(string line) {
-	//addHeader(key, value);
+	string key = "", value = "";
 }
 
 void HTTPMessage::addHeader(string key, string value) {
     headers->insert(pair<string, string>(key, value));
+}
+
+void HTTPMessage::putHeaders() {
+    
 }
 
 /**

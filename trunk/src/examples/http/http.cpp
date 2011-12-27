@@ -36,7 +36,7 @@ int main() {
 	l3 = msg->getLine(); // Expected: 
 	l4 = msg->getLine(); // Expected: 
 
-    printf("%s (%i)\n%s (%i)\n%s (%i)\n%s (%i)\n\n", l1.c_str(), l1.size(), l2.c_str(), l2.size(), l3.c_str(), l3.size(), l4.c_str(), l4.size());
+    printf("%s (%u)\n%s (%u)\n%s (%u)\n%s (%u)\n\n", l1.c_str(), l1.size(), l2.c_str(), l2.size(), l3.c_str(), l3.size(), l4.c_str(), l4.size());
 
 	// Test HTTPRequest parse()
 	req->parse();

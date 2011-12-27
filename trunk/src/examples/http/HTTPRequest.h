@@ -57,6 +57,7 @@ private:
 
 private:
 	int methodStrToInt(string name);
+    string methodIntToStr(unsigned int mid);
     
 protected:
     virtual void init();

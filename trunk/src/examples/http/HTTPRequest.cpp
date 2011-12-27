@@ -47,7 +47,19 @@ void HTTPRequest::init() {
 	dataLen = 0;
 }
 
+/**
+ * Takes the method name and converts it to the corresponding method
+ * id detailed in the Method enum
+ *
+ * @param name String representation of the Method
+ * @return Corresponding Method ID, -1 if unable to find the method
+ */
 int HTTPRequest::methodStrToInt(string name) {
+    // Method name cannot must be between 1 and 10 characters. Anything outside those bounds shouldn't be compared at all
+    if(name.empty() || (name.size() >= 10))
+        return -1;
+    
+    // Loop through requestMethodStr array and attempt to match the 'name' with a known method in the array
 	int ret = -1;
 	for(int i = 0; i < 9; i++) {
 		if(strcmp(requestMethodStr[i], name.c_str()) == 0) {
@@ -58,8 +70,47 @@ int HTTPRequest::methodStrToInt(string name) {
 	return ret;
 }
 
+/**
+ * Takes the method ID in the Method enum and returns the corresponding string representation
+ * @param mid Method ID to lookup
+ * @return The method name in the from of a string. Blank if unable to find the method
+ */
+string HTTPRequest::methodIntToStr(unsigned int mid) {
+    // ID is out of bounds of the possible requestMethodStr indexes
+    if(mid >= 9)
+        return "";
+    
+    // Return the string matching the id
+    return requestMethodStr[mid];
+}
+
 byte* HTTPRequest::create() {
-	return NULL;
+    // Clear the bytebuffer in the event this isn't the first call of create()
+    clear();
+    
+    // Insert the initial line: <method> <path> <version>\r\n
+    string mstr = "";
+    mstr = methodIntToStr(method);
+    if(mstr.empty()) {
+        printf("Could not create HTTPRequest, unknown method id: %i\n", method);
+        return NULL;
+    }
+    putLine(mstr + requestUri + HTTP_VERSION);
+    
+    // Put all headers
+    putHeaders();
+    
+    // If theres data, add it now
+    if((data != NULL) && dataLen > 0) {
+        putBytes(data, dataLen);
+    }
+    
+    // Allocate space for the returned byte array and return it
+    byte *retData = new byte[size()];
+    setReadPos(0);
+    getBytes(retData, size());
+    
+    return retData;
 }
 
 void HTTPRequest::parse() {
