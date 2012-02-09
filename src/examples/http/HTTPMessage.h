@@ -28,6 +28,32 @@
 #define HTTP_VERSION "HTTP/1.1"
 #define SERVER_HEAD "httpserver/1.0 ramsey"
 
+// HTTP Methods (Requests)
+
+enum Method {
+	HEAD = 0,
+	GET = 1,
+	POST = 2,
+	PUT = 3,
+	DEL = 4, // DELETE is taken, use DEL instead
+	TRACE = 5,
+	OPTIONS = 6,
+	CONNECT = 7,
+	PATH = 8
+};
+
+const static char* const requestMethodStr[] = {
+	"HEAD", // 0
+	"GET", // 1
+	"POST", // 2
+	"PUT", // 3
+	"DELETE", // 4
+	"TRACE", // 5
+	"OPTIONS", // 6
+	"CONNECT", // 7
+	"PATH" // 8
+};
+
 // HTTP Response Status codes
 enum Status {
     // 1xx Informational
@@ -64,18 +90,20 @@ public:
     HTTPMessage(byte *pData, unsigned int len);
     virtual ~HTTPMessage();
     
-    virtual byte* create() {return NULL;};
+    virtual byte* create(bool freshCreate=false) {return NULL;};
     virtual void parse() {};
     
     void putLine(string str, bool crlf_end=true);
     
 	string getLine();
-    string getStrElement(char delim = ' ');
+    string getStrElement(char delim = 0x20); // 0x20 = "space"
     
 	void addHeader(string line);
     void addHeader(string key, string value);
     void putHeaders();
     string getHeaderValue(string key);
+	string getHeaderStr(int index);
+	int getNumHeaders();
     void clearHeaders();
     
     // Getters & Setters

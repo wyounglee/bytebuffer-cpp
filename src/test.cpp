@@ -21,6 +21,7 @@
 
 int main() {
 	ByteBuffer *bb1 = new ByteBuffer(30);
+	ByteBuffer *bb2 = new ByteBuffer();
 	bb1->printPosition();
 	bb1->put(0xDE);
 	bb1->put(0xAD);
@@ -46,6 +47,13 @@ int main() {
 	printf("t1 = %x, t2 = %x, t3 = %x, t4 = %x, t5 = %x\n", t1, t2, t3, t4, t5);
     printf("f0 = %i, f1 = %i, f2 = %i\n", f0, f1, f2);
 	bb1->printPosition();
+
+	string test = "TesT\r\ntest2\n";
+	bb2->putBytes((byte*)test.c_str(), test.size());
+	bb2->printHex();
+	bb2->printAscii();
+
 	delete bb1;
+	delete bb2;
 	return 0;
 }

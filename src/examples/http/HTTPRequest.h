@@ -21,43 +21,16 @@
 
 #include "HTTPMessage.h"
 
-// HTTP Methods (Requests)
-
-enum Method {
-	HEAD = 0,
-	GET = 1,
-	POST = 2,
-	PUT = 3,
-	DEL = 4, // DELETE is taken, use DEL instead
-	TRACE = 5,
-	OPTIONS = 6,
-	CONNECT = 7,
-	PATH = 8
-};
-
-const static char* const requestMethodStr[] = {
-	"HEAD", // 0
-	"GET", // 1
-	"POST", // 2
-	"PUT", // 3
-	"DELETE", // 4
-	"TRACE", // 5
-	"OPTIONS", // 6
-	"CONNECT", // 7
-	"PATH" // 8
-};
-
 class HTTPRequest : public HTTPMessage {
 private:
     int method;
     string requestUri;
     string version;
+	byte* createRetData;
 	byte* data;
 	unsigned int dataLen;
 
-private:
-	int methodStrToInt(string name);
-    string methodIntToStr(unsigned int mid);
+	bool createCached;
     
 protected:
     virtual void init();
@@ -68,8 +41,13 @@ public:
     HTTPRequest(byte *pData, unsigned int len);
     virtual ~HTTPRequest();
     
-    virtual byte *create();
+    virtual byte *create(bool freshCreate=false);
     virtual void parse();
+
+	// Helper functions
+
+	int methodStrToInt(string name);
+    string methodIntToStr(unsigned int mid);
     
     // Info getters  & setters
     
@@ -97,16 +75,13 @@ public:
         return version;
     }
 
-	void setData(byte* d) {
+	void setData(byte* d, unsigned int len) {
 		data = d;
+		dataLen = len;
 	}
 
 	byte* getData() {
 		return data;
-	}
-
-	void setDataLength(unsigned int l) {
-		dataLen = l;
 	}
 
 	unsigned int getDataLength() {

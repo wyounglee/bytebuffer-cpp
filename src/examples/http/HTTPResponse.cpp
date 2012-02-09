@@ -75,7 +75,7 @@ string HTTPResponse::getStatusStr() {
     return ret;
 }
 
-byte* HTTPResponse::create() {
+byte* HTTPResponse::create(bool freshCreate) {
 	return NULL;
 }
 

@@ -25,9 +25,8 @@
  * @param size Size of space to preallocate internally. Default is 4096 bytes
  */
 ByteBuffer::ByteBuffer(unsigned int size) {
-	rpos = 0;
-	wpos = 0;
 	buf.reserve(size);
+	clear();
 #ifdef BB_UTILITY
 	name = "";
 #endif
@@ -41,9 +40,8 @@ ByteBuffer::ByteBuffer(unsigned int size) {
  * @param size Size of space to allocate
  */
 ByteBuffer::ByteBuffer(byte* arr, unsigned int size) {
-	rpos = 0;
-	wpos = 0;
 	buf.reserve(size);
+	clear();
 	putBytes(arr, size);
 #ifdef BB_UTILITY
 	name = "";
@@ -326,9 +324,27 @@ std::string ByteBuffer::getName() {
 	return name;
 }
 
+void ByteBuffer::printInfo() {
+	unsigned int length = buf.size();
+	std::cout << "ByteBuffer " << name.c_str() << " Length: " << length << ". Info Print" << std::endl;
+}
+
+void ByteBuffer::printAH() {
+	unsigned int length = buf.size();
+	std::cout << "ByteBuffer " << name.c_str() << " Length: " << length << ". ASCII & Hex Print" << std::endl;
+	for(unsigned int i = 0; i < length; i++) {
+		printf("0x%02x ", buf[i]);
+	}
+	printf("\n");
+	for(unsigned int i = 0; i < length; i++) {
+		printf("%c ", buf[i]);
+	}
+	printf("\n");
+}
+
 void ByteBuffer::printAscii() {
 	unsigned int length = buf.size();
-	std::cout << "ByteBuffer " << name.c_str() << ", Length: " << length << ". ASCII Print" << std::endl;
+	std::cout << "ByteBuffer " << name.c_str() << " Length: " << length << ". ASCII Print" << std::endl;
 	for(unsigned int i = 0; i < length; i++) {
 		printf("%c ", buf[i]);
 	}
@@ -337,7 +353,7 @@ void ByteBuffer::printAscii() {
 
 void ByteBuffer::printHex() {
 	unsigned int length = buf.size();
-	std::cout << "ByteBuffer " << name.c_str() << ", Length: " << length << ". Hex Print" << std::endl;
+	std::cout << "ByteBuffer " << name.c_str() << " Length: " << length << ". Hex Print" << std::endl;
 	for(unsigned int i = 0; i < length; i++) {
 		printf("0x%02x ", buf[i]);
 	}
@@ -346,6 +362,6 @@ void ByteBuffer::printHex() {
 
 void ByteBuffer::printPosition() {
 	unsigned int length = buf.size();
-	std::cout << "ByteBuffer " << name.c_str() << ", Length: " << length << " Read Pos: " << rpos << ". Write Pos: " << wpos << std::endl;
+	std::cout << "ByteBuffer " << name.c_str() << " Length: " << length << " Read Pos: " << rpos << ". Write Pos: " << wpos << std::endl;
 }
 #endif

@@ -62,6 +62,7 @@ private:
 		if (size() < (wpos + s))
 			buf.resize(wpos + s);
 		memcpy(&buf[wpos], (byte*)&data, s);
+		//printf("writing %c to %u\n", ((uns, wpos);
 
 		wpos += s;
 	}
@@ -170,6 +171,8 @@ public:
 #ifdef BB_UTILITY
 	void setName(string n);
 	string getName();
+	void printInfo();
+	void printAH();
 	void printAscii();
 	void printHex();
 	void printPosition();
