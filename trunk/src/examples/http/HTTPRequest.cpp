@@ -32,10 +32,9 @@ HTTPRequest::HTTPRequest(byte* pData, unsigned int len) : HTTPMessage(pData, len
 }
 
 HTTPRequest::~HTTPRequest() {
-	if(data != NULL) {
-		delete data;
-		data = NULL;
-		dataLen = 0;
+	if(createRetData != NULL) {
+		delete createRetData;
+		createRetData = NULL;
 	}
 }
 
@@ -45,6 +44,8 @@ void HTTPRequest::init() {
     version = "";
 	data = NULL;
 	dataLen = 0;
+	createRetData = NULL;
+	createCached = false;
 }
 
 /**
@@ -84,9 +85,25 @@ string HTTPRequest::methodIntToStr(unsigned int mid) {
     return requestMethodStr[mid];
 }
 
-byte* HTTPRequest::create() {
-    // Clear the bytebuffer in the event this isn't the first call of create()
-    clear();
+/**
+ * Create
+ * Create and return a byte array of an HTTP request, built from the variables of this HTTPRequest
+ *
+ * @
+ * @return Byte array of this HTTPRequest to be sent over the wire
+ */
+byte* HTTPRequest::create(bool freshCreate) {
+    // Clear the bytebuffer in the event this isn't the first call of create(), or if a fresh create is desired
+	if(!createCached || freshCreate) {
+		clear();
+	} else { // Otherwise, return the already created data
+		return createRetData;
+	}
+	
+	if(createRetData != NULL) {
+		delete createRetData;
+		createRetData = NULL;
+	}
     
     // Insert the initial line: <method> <path> <version>\r\n
     string mstr = "";
@@ -95,7 +112,7 @@ byte* HTTPRequest::create() {
         printf("Could not create HTTPRequest, unknown method id: %i\n", method);
         return NULL;
     }
-    putLine(mstr + requestUri + HTTP_VERSION);
+    putLine(mstr + " " + requestUri + " " + HTTP_VERSION);
     
     // Put all headers
     putHeaders();
@@ -106,15 +123,22 @@ byte* HTTPRequest::create() {
     }
     
     // Allocate space for the returned byte array and return it
-    byte *retData = new byte[size()];
-    setReadPos(0);
-    getBytes(retData, size());
+	createRetData = new byte[size()];
+	setReadPos(0);
+	getBytes(createRetData, size());
+
+	// createCached should now be true, because a create was successfully performed.
+	createCached = true;
     
-    return retData;
+    return createRetData;
 }
 
+/**
+ * Parse
+ * Populate internal HTTPRequest variables by parsing the HTTP data
+ */
 void HTTPRequest::parse() {
-	string initial = "", methodName = "", hline = "";
+	string initial = "", methodName = "", hline = "", app = "";
 
 	// Get elements from the initial line: <method> <path> <version>\r\n
 	methodName = getStrElement();
@@ -125,7 +149,7 @@ void HTTPRequest::parse() {
 	method = methodStrToInt(methodName);
 	if(method == -1) {
 		parseError = true;
-		parseErrorStr = "Invalid Method";
+		parseErrorStr = "Invalid Method: " + methodName;
 		return;
 	}
 
@@ -141,13 +165,27 @@ void HTTPRequest::parse() {
 
 	// Keep pulling headers until a blank line has been reached (signaling the end of headers)
 	while(hline.size() > 0) {
-		// TODO: handle case where values are on multiple lines ending with ,\r\n
+		// Case where values are on multiple lines ending with a comma
+		app = hline;
+		while(app[app.size()-1] == ',') {
+			app = getLine();
+			hline += app;
+		}
+		
 		addHeader(hline);
 		hline = getLine();
 	}
 
-	// If the method has data, pull the binary data starting from here until the end of the buffer
+	// Only POST and PUT can have Content (data after headers)
 	if((method != POST) && (method != PUT))
+		return;
+
+	// Content-Length should exist. If it does, pull the data starting from here until the end of the buffer
+	// The reason we don't use the Content-Length header's value is because I don't want to assume where the byte count starts from
+	string hlen = "";
+	hlen = getHeaderValue("Content-Length");
+	printf("hlen: %s\n", hlen.c_str());
+	if(hlen.empty())
 		return;
 
 	// Create a big enough buffer to store the data

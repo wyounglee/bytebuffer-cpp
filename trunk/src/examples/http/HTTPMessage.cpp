@@ -1,6 +1,6 @@
 #include "HTTPMessage.h"
 
-HTTPMessage::HTTPMessage() : ByteBuffer() {
+HTTPMessage::HTTPMessage() : ByteBuffer(4096) {
     this->init();
 }
 
@@ -37,8 +37,8 @@ void HTTPMessage::putLine(string str, bool crlf_end) {
     if(crlf_end)
         str += "\r\n";
     
-    // Put the entire contents of str (with null termination) into the buffer
-    putBytes((byte*)str.c_str(), str.size()+1);
+    // Put the entire contents of str into the buffer
+    putBytes((byte*)str.c_str(), str.size());
 }
 
 /**
@@ -118,16 +118,49 @@ string HTTPMessage::getStrElement(char delim) {
     return ret;
 }
 
+/**
+ * Add Header to the Map from string
+ * Takes a formatted header string "Header: value", parse it, and put it into the map as a key,value pair.
+ *
+ * @param string containing formatted header: value
+ */
 void HTTPMessage::addHeader(string line) {
 	string key = "", value = "";
+	size_t kpos;
+	int i = 0;
+	kpos = line.find(':');
+	if(kpos == string::npos) {
+		printf("Could not addHeader: %s\n", line.c_str());
+		return;
+	}
+	key = line.substr(0, kpos);
+	value = line.substr(kpos+1, line.size()-kpos-1);
+	
+	// Skip all leading spaces in the value
+	while(value.at(i) == 0x20) {
+		i++;
+	}
+	value = value.substr(i, value.size());
+	
+	// Add header to the map
+	addHeader(key, value);
 }
 
 void HTTPMessage::addHeader(string key, string value) {
     headers->insert(pair<string, string>(key, value));
 }
 
+/**
+ * Put Headers
+ * Write all headers currently in the 'headers' map to the ByteBuffer.
+ * 'Header: value'
+ */
 void HTTPMessage::putHeaders() {
-    
+    map<string,string>::const_iterator it;
+    for(it = headers->begin(); it != headers->end(); it++) {
+		string final = it->first + ": " + it->second;
+		putLine(final, true);
+	}
 }
 
 /**
@@ -147,6 +180,37 @@ string HTTPMessage::getHeaderValue(string key) {
     
     // Otherwise, return the value
     return it->second;
+}
+
+/**
+ * Get Header String
+ * Get the full formatted header string "Header: value" from the headers map at position index
+ * 
+ * @ret Formatted string with header name and value
+ */
+string HTTPMessage::getHeaderStr(int index) {
+	int i = 0;
+	string ret = "";
+    map<string,string>::const_iterator it;
+    for(it = headers->begin(); it != headers->end(); it++) {
+		if(i == index) {
+			ret = it->first + ": " + it->second;
+			break;
+		}
+
+		i++;
+	}
+	return ret;
+}
+
+/**
+ * Get Number of Headers
+ * Return the number of headers in the headers map
+ *
+ * @return size of the map
+ */
+int HTTPMessage::getNumHeaders() {
+	return headers->size();
 }
 
 void HTTPMessage::clearHeaders() {
